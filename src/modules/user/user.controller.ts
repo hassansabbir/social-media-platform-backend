@@ -55,8 +55,30 @@ const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   }
 };
 
+const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const parsed = UserValidation.updateProfileSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues });
+      return;
+    }
+
+    if (!req.user || !req.user._id) {
+       res.status(401).json({ error: 'Unauthorized' });
+       return;
+    }
+
+    const updatedUser = await UserService.updateProfile(req.user._id, parsed.data);
+    res.json({ user: updatedUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 export const UserController = {
   register,
   login,
   getMe,
+  updateProfile,
 };

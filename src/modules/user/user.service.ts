@@ -44,8 +44,17 @@ const getMe = async (id: string) => {
   return user;
 };
 
+const updateProfile = async (id: string, data: any) => {
+  const user = await User.findByIdAndUpdate(id, { $set: data }, { new: true, runValidators: true }).select('-passwordHash');
+  if (!user) {
+    throw new Error('User not found');
+  }
+  return user;
+};
+
 export const UserService = {
   registerUser,
   loginUser,
   getMe,
+  updateProfile,
 };
